@@ -18,7 +18,7 @@ except ImportError:
 
 
 def get_keys():
-    c = environ.get("firebase-key")
+    c = environ.get("firebase_key")
     if c:
         return loads(b64decode(c.strip()).decode())
     else:
