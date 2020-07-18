@@ -1,8 +1,13 @@
+from re import sub as _sub
+from urllib.parse import urljoin, urlparse
+
 import requests
 from bs4 import BeautifulSoup as Soup
-from constants import BASIC_HEADERS, PROTO, HOST
-from re import sub as _sub
-from urllib.parse import urlparse, urljoin
+
+try:
+    from ._constants import BASIC_HEADERS, HOST, PROTO
+except ImportError:
+    from _constants import BASIC_HEADERS, HOST, PROTO
 
 
 def check_html5lib():
@@ -39,7 +44,7 @@ def image_url_parser(img: str) -> dict:
     return {"full": full_hd_url, "template_height": _height}
 
 
-sanitize_str = lambda movie: _sub(r"([^\w]|_)", "", movie).lower()
+sanitize_str = lambda movie: _sub(r"([^\w]|_)", "", movie).strip().lower()
 
 
 def get_page(url: str) -> Soup:
@@ -51,3 +56,17 @@ def get_page(url: str) -> Soup:
 
 def next_table(el):
     return el.find_next("table") if el else None
+
+
+def resp_template(r_type, dct: dict) -> dict:
+    return {"data": {r_type: dct}}
+
+
+def array_to_nodes(arr: list, as_iter=False) -> dict:
+    _iter = map(lambda x: {"__node": x}, arr)
+    return _iter if as_iter else list(_iter)
+
+
+def de_nodify(arr: list, as_iter=False) -> list:
+    _iter = map(lambda x: x["__node"], arr)
+    return _iter if as_iter else list(_iter)

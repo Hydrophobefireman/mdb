@@ -1,6 +1,24 @@
-from constants import PROTO, HOST, API_ROUTE, MAX_CAST_SIZE, MAX_TRIVIA_SIZE
 from urllib.parse import urljoin
-from util import image_url_parser, get_page, next_table, id_to_url, remove_falsey_values
+
+try:
+
+    from .._constants import API_ROUTE, HOST, MAX_CAST_SIZE, MAX_TRIVIA_SIZE, PROTO
+    from .._util import (
+        get_page,
+        id_to_url,
+        image_url_parser,
+        next_table,
+        remove_falsey_values,
+    )
+except ImportError:
+    from _constants import API_ROUTE, HOST, MAX_CAST_SIZE, MAX_TRIVIA_SIZE, PROTO
+    from _util import (
+        get_page,
+        id_to_url,
+        image_url_parser,
+        next_table,
+        remove_falsey_values,
+    )
 
 
 def scrape_credits(movie_id: str) -> dict:
@@ -15,6 +33,7 @@ def scrape_credits(movie_id: str) -> dict:
     director = (
         next_table(directed_by[0]).text.strip() if directed_by else "%%UNKNWOWN%%"
     )
+    director = director.split("\n")[0].strip()
     cast = next_table(page.find(attrs={"id": "cast"}))
     if cast is None:
         return None

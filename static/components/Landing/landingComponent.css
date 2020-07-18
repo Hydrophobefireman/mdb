@@ -1,0 +1,102 @@
+/* .landing-input-box[typing] {
+    transition: var(--transition-default);
+}
+
+.landing-input-box[notyping] {
+} */
+
+.landing-input-box:hover,
+.landing-input-box:active,
+.landing-input-box:focus {
+  border: 3px solid var(--primary-color);
+}
+
+.fancy-text {
+  font-family: "Amatic SC", sans-serif;
+  font-size: 70px;
+  user-select: none;
+}
+
+.info-header {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+}
+
+.landing-search-box {
+  z-index: 3000;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--primary-background-color);
+  background-image: var(--primary-background-image);
+}
+
+.close-search-component {
+  height: 24px;
+  width: 24px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20height=%2224%22%20viewBox=%220%200%2024%2024%22%20width=%2224%22%3E%3Cpath%20d=%22M0%200h24v24H0V0z%22%20fill=%22none%22/%3E%3Cpath%20d=%22M19%2011H7.83l4.88-4.88c.39-.39.39-1.03%200-1.42-.39-.39-1.02-.39-1.41%200l-6.59%206.59c-.39.39-.39%201.02%200%201.41l6.59%206.59c.39.39%201.02.39%201.41%200%20.39-.39.39-1.02%200-1.41L7.83%2013H19c.55%200%201-.45%201-1s-.45-1-1-1z%22/%3E%3C/svg%3E");
+}
+
+.landing-input-box,
+.search-box-animated {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  width: 80%;
+  margin: auto;
+  height: 50px;
+  border: 3px solid var(--primary-text-color);
+  color: var(--primary-text-color);
+  cursor: text;
+  border-radius: 10px;
+  outline: none;
+  padding: 10px;
+}
+.landing-search-box {
+  user-select: none;
+}
+.search-box-animated {
+  background: transparent;
+  font-weight: bold;
+  font-size: 30px;
+  transition: 0.5s linear;
+  transform: translateY(300px);
+  animation: moveSearchBoxUp 0.2s linear 0.01s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes moveSearchBoxUp {
+  from {
+  }
+  to {
+    transform: translateY(0px);
+  }
+}
+@keyframes showButton {
+  from {
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.search-button {
+  cursor: pointer;
+  opacity: 0;
+  outline: none;
+  margin-top: 20px;
+  padding: 8px;
+  border: 2px solid var(--primary-text-color);
+  border-radius: 10px;
+  width: 15%;
+  background: var(--primary-background-color);
+  animation: showButton 0.2s linear 0.15s;
+  animation-fill-mode: forwards;
+}

@@ -1,7 +1,12 @@
-from constants import PROTO, HOST, API_ROUTE
-from urllib.parse import urlencode, urljoin, urlparse
-from util import image_url_parser, get_page, sanitize_str, get_id
 from typing import List
+from urllib.parse import urlencode, urljoin, urlparse
+
+try:
+    from .._constants import API_ROUTE, HOST, PROTO
+    from .._util import get_id, get_page, image_url_parser, sanitize_str
+except ImportError:
+    from _constants import API_ROUTE, HOST, PROTO
+    from _util import get_id, get_page, image_url_parser, sanitize_str
 
 
 def get_url(find: str) -> str:
@@ -41,6 +46,7 @@ class IMDBSearchResult(object):
 
 
 def scrape_search(title: str) -> List[IMDBSearchResult]:
+
     url = get_url(title)
     soup = get_page(url)
     results = soup.find("table").find_all("tr")
@@ -53,4 +59,3 @@ def scrape_search(title: str) -> List[IMDBSearchResult]:
         for result in results
     ]
     return data
-

@@ -1,9 +1,15 @@
-from crawlers.search_crawler import scrape_search
-from crawlers.movie_crawler import scrape_movie_data, IMDBMovieData
-from constants import HOST, PROTO
-from util import get_id, id_to_url, get_page, image_url_parser, sanitize_str
 from urllib.parse import urljoin
-
+try:
+    from ._constants import HOST, PROTO
+    from ._util import get_id, get_page, id_to_url, image_url_parser, sanitize_str
+    from .crawlers._movie_crawler import IMDBMovieData, scrape_movie_data
+    from .crawlers._search_crawler import scrape_search
+    
+except ImportError:
+    from _constants import HOST, PROTO
+    from _util import get_id, get_page, id_to_url, image_url_parser, sanitize_str
+    from crawlers._movie_crawler import IMDBMovieData, scrape_movie_data
+    from crawlers._search_crawler import scrape_search
 
 def _normalize_movie_data(imdb_data: IMDBMovieData, mid: str):
     actor_id_to_name_dict = {}
@@ -70,4 +76,3 @@ def add_movies(q):
 def get_movie_from_id(idx: str):
     data = scrape_movie_data(idx)
     return _normalize_movie_data(data, idx)
-

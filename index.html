@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MDB - The Movies App</title>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta name="description" content="MDB - Movies App" />
+    <base href="/" />
+    <script>
+      window.__mdbApp=JSON.parse(<%= JSON.stringify(JSON.stringify(require("./injectables/initialConfig.json"))) %>)
+    </script>
+    <%=
+    require("./injectables/createLinkTags.js").create(require('./injectables/preconnectOrigins.json'),"preconnect")
+    %>
+    <link
+      rel="preload"
+      href="https://fonts.pycode.tk/open-sans.css"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <link
+      rel="preload"
+      href="https://fonts.pycode.tk/amatic-sc.css"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <script>
+      <%= require("./injectables/preloadPaths.js").create() %>
+    </script>
+  </head>
+  <body>
+    <template is="custom" custom-element="loading-spinner"
+      ><style>
+        .spinner {
+          margin: auto;
+          height: 50px;
+          width: 50px;
+          border-radius: 50%;
+          animation: rotate 0.8s infinite linear;
+          border: 6px solid var(--background-color);
+          border-right-color: var(--primary-text-color);
+          border-bottom-color: var(--primary-text-color);
+          border-left-color: var(--primary-text-color);
+          transition: var(--transition-default);
+        }
+        @keyframes rotate {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      </style>
+      <div class="spinner"></div
+    ></template>
+    <script>
+      <%= require("./injectables/getMouseOrTouch.js").create() %>
+    </script>
+    <div id="app-root" unrendered>
+      <noscript>This App Uses Javascript</noscript>
+      <loading-spinner>Loading Your App</loading-spinner>
+    </div>
+  </body>
+</html>

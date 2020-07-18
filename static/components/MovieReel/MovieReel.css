@@ -1,0 +1,49 @@
+.movie-reel-item {
+  cursor: pointer;
+  transition: 0.3s linear;
+  display: block;
+  text-align: center;
+  margin: 5px 10px;
+  text-decoration: none;
+  text-decoration: none;
+  color: var(--primary-text-color);
+  outline: none;
+}
+.movie-reel-item:not([no-animate="true"]) {
+  animation: cardLike 0.4s linear;
+  transform: translate(-500px, 800px);
+  animation-fill-mode: forwards;
+}
+.movie-reel-item-text {
+  max-width: 150px;
+  display: flex;
+  text-align: center;
+  margin: auto;
+  margin-top: 5px;
+  font-weight: 700;
+  width: fit-content;
+}
+@keyframes cardLike {
+  from {
+    transform: translate(-500px, 800px);
+  }
+  to {
+    transform: translate(0px, 0px);
+  }
+}
+
+.movie-reel-item > div {
+  background-size: contain;
+  height: 200px;
+  width: 150px;
+  border-radius: 10px;
+  transition: 0.3s linear;
+  filter: var(--movie-reel-filter);
+}
+
+.movie-reel-item:hover > div,
+.movie-reel-item:active > div,
+.movie-reel-item:focus > div {
+  filter: none;
+  transform: scale(1.05);
+}

@@ -1,0 +1,34 @@
+{
+  "config": {
+    "app": "MDB - The Movies Database",
+    "app.lazyLoadRoutes": true,
+    "app.experiments": {},
+    "app._serverRendered": false,
+    "app.serviceWorker": false
+  },
+  "apiRoutes": {
+    "imdb.addMovie": {
+      "path": "/query/movies/_/imdb_add/_/",
+      "method": "post"
+    },
+    "imdb.search": { "path": "/query/movies/search/_/imdb/", "method": "get" },
+    "actor.idSearch": { "path": "/query/actors/id/search/", "method": "get" },
+    "movie.idSearch": { "path": "/query/movies/id/search/", "method": "get" },
+    "actor.search": { "path": "/query/actors/search/", "method": "get" },
+    "movie.search": { "path": "/query/movies/search/", "method": "get" }
+  },
+  "preloadPaths": {
+    "landingMovies": {
+      "path": "/query/get/landing.json",
+      "type": "application/json",
+      "crossorigin": false
+    }
+  },
+  "deprecatedPreloadPaths": {
+    "posterReel": {
+      "path": "/query/get/reel.json",
+      "type": "application/json",
+      "crossorigin": true
+    }
+  }
+}

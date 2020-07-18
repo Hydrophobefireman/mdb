@@ -1,0 +1,44 @@
+html {
+  --background-color: rgb(255, 255, 255);
+  --primary-color: rgb(0, 0, 0);
+  --primary-non-bw-color: rgb(26, 115, 232);
+  --primary-text-color: rgb(60, 64, 67);
+  --primary-background-color: #e3e3e3;
+  --primary-background-image: linear-gradient(215deg, #ccc 58%, #e3e3e3 92%);
+  --transition-default: 0.1s linear;
+  --header-component-height: 40px;
+  -webkit-tap-highlight-color: transparent;
+}
+html[data-img-color="false"],
+html:not([data-img-color="true"]) {
+  --movie-reel-filter: grayscale(1);
+}
+html[data-img-color="true"] {
+  --movie-reel-filter: none;
+}
+body {
+  font-family: "Open Sans", sans-serif;
+  transition: var(--transition-default);
+  background-color: var(--primary-background-color);
+  background-image: var(--primary-background-image);
+}
+
+#app-root {
+  margin: auto;
+  text-align: center;
+}
+
+.app-shell {
+  margin-top: var(--header-component-height);
+}
+
+.hoverable:not([disabled]) {
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+  transform-style: preserve-3d;
+}
+.hoverable:hover:not([disabled]),
+.hoverable:active:not([disabled]),
+.hoverable:focus:not([disabled]) {
+  transform: perspective(1px) scale(1.048) translate3d(0, 0, 0);
+}

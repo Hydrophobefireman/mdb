@@ -1,0 +1,53 @@
+{
+  "name": "mdb-frontend",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "rm -rf ./docs && cp webpack.config.js webpack.config.prod.js && webpack --config webpack.config.prod.js && rm webpack.config.prod.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hydrophobefireman/mdb-frontend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hydrophobefireman/mdb-frontend/issues"
+  },
+  "homepage": "https://github.com/Hydrophobefireman/mdb-frontend#readme",
+  "devDependencies": {
+    "@babel/core": "^7.10.5",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/preset-modules": "^0.1.3",
+    "@babel/runtime-corejs3": "^7.10.5",
+    "autoprefixer": "^9.8.5",
+    "babel-loader": "^8.1.0",
+    "core-js": "^3.6.5",
+    "css-loader": "^3.6.0",
+    "cssnano": "^4.1.10",
+    "file-loader": "^6.0.0",
+    "html-webpack-plugin": "^4.3.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "postcss-cli": "^7.1.1",
+    "postcss-loader": "^3.0.0",
+    "style-ext-html-webpack-plugin": "^4.1.2",
+    "terser": "^4.8.0",
+    "terser-webpack-plugin": "^3.0.7",
+    "url-loader": "^4.1.0",
+    "webpack": "^5.0.0-beta.13",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0",
+    "webpack-module-nomodule-plugin": "0.4.0"
+  },
+  "dependencies": {
+    "@hydrophobefireman/j-utils": "^2.1.1",
+    "@hydrophobefireman/qwc": "^0.0.6",
+    "@hydrophobefireman/ui-lib": "^1.4.5"
+  }
+}
