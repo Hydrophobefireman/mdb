@@ -3,10 +3,11 @@ from os.path import isfile, isdir, join
 from os import mkdir, getcwd, remove
 from functools import wraps
 from time import time
+from tempfile import gettempdir
 
 caching_options = {
     "enable_caching": True,
-    "directory": join(getcwd(), "@cache"),
+    "directory": gettempdir(),
     "get_file_name": lambda x: f"{x}.cache.json",
     "expire_if_older_than_seconds": 86400,
 }
