@@ -8,7 +8,7 @@ def upload(imgurl):
     try:
         imgurl = imgurl["full"] if isinstance(imgurl, dict) else imgurl
         if "nopicture" in imgurl:
-            return 0
+            return ""
         clapi_key = os.environ.get("key")
         clapi_secret = os.environ.get("cl_secret")
         if clapi_key is None:
@@ -21,8 +21,8 @@ def upload(imgurl):
         a = cloudinary.uploader.upload(imgurl)["secure_url"]
         return a
     except Exception as e:
-        print(e)
-        return 0
+        print(e, imgurl)
+        return ""
 
 
 if __name__ == "__main__":

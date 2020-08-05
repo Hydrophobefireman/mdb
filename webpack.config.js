@@ -82,6 +82,29 @@ function getCfg(isLegacy) {
     },
     plugins: [
       new HtmlWebpackPlugin({
+        templateParameters: async function templateParametersGenerator(
+          compilation,
+          assets,
+          assetTags,
+          options
+        ) {
+          return {
+            compilation: compilation,
+            webpackConfig: compilation.options,
+            htmlWebpackPlugin: {
+              tags: assetTags,
+              files: assets,
+              options: Object.assign(options, {
+                mouseOrTouch: await require("./injectables/getMouseOrTouch.js").create(),
+                preloadPaths: await require("./injectables/preloadPaths.js").create(),
+                preconnectOrigins: require("./injectables/createLinkTags.js").create(
+                  require("./injectables/preconnectOrigins.json"),
+                  "preconnect"
+                ),
+              }),
+            },
+          };
+        },
         inject: "body",
         template: `${__dirname}/index.html`,
         xhtml: !0,

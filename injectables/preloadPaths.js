@@ -23,6 +23,6 @@ const code = function () {
   }
 };
 function create() {
-  return minify(`(${code})()`).code;
+  return minify(`(${code})()`).then((x) => x.code);
 }
 module.exports = { create };

@@ -1,99 +1,143 @@
-import Component, { h } from "@hydrophobefireman/ui-lib";
+import {
+  h,
+  useRef,
+  useCallback,
+  useEffect,
+  useState,
+} from "@hydrophobefireman/ui-lib";
 import { getRequest } from "../../http/requests";
 import entries from "@hydrophobefireman/j-utils/@build-modern/src/modules/Object/entries";
-import { apiURL } from "../../utils/urlHandler";
+import { apiURL, deNodeify } from "../../utils/urlHandler";
 import MovieReel from "../MovieReel/MovieReel";
 import { debounce } from "../../utils/debounce";
+import FakeSet from "@hydrophobefireman/j-utils/@build-modern/src/modules/es6/loose/Set";
 
 const _normalize = (str) => (str || "").trim().toLowerCase();
-export default class RealTimeResponseThumbnailComponent extends Component {
-  constructor(props) {
-    super(props);
-    /**
-     * @type {{pendingResponse:Promise<Response>|null,controller:AbortController|null}}
-     */
-    this.state = {
-      pendingResponse: null,
-      controller: null,
-      receivedData: null,
+export function parseData(data) {
+  const obj = data.data.movieSearchResults || data.data.actorSearchResults;
+  const receivedData = [];
+  entries(obj).forEach(([k, v]) => {
+    const isActor = "name" in v;
+    const ret = {
+      name: v.name || v.movie_title,
+      thumb: v.movie_thumb || v.thumbnail,
+      [isActor ? "actor_id" : "movie_id"]: k,
     };
-  }
-  parseData(data) {
-    const obj = data.data.movieSearchResults;
-    const receivedData = [];
-    entries(obj).forEach(([k, v]) => {
-      v.movie_id = k;
-      receivedData.push(v);
-    });
-    return receivedData;
-  }
-  __getFetchingPromise = debounce(250, (q) => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-    const request = getRequest(
-      apiURL("/query/movies/search/", { q, isAutoComplete: true }),
-      null,
-      {
-        signal,
-      }
-      // DO NOT cache this
-    );
-    const newState = { controller, pendingResponse: request };
-    request
-      .then((resp) => resp.json())
-      .then((data) => {
-        this.setState({
-          pendingResponse: null,
-          controller: null,
-          receivedData: this.parseData(data),
-        });
-      });
-    this.setState(newState);
+    receivedData.push(ret);
   });
-
-  componentDidUpdate = (oldProps, oldState) => {
-    let { query } = this.props;
-    let { query: oldQuery } = oldProps || {};
-    query = _normalize(query);
-    oldQuery = _normalize(oldQuery);
-    if (!query) {
-      if (this.state.receivedData && this.state.receivedData.length) {
-        this.setState({ receivedData: [] });
-      }
-      return;
-    }
-    if (query === oldQuery) {
-      if (this.state.pendingResponse == null && !this.state.receivedData) {
-        this.__getFetchingPromise(query);
-      }
-    } else {
-      if (this.state.pendingResponse != null) {
-        this.state.controller.abort();
-      }
-      // this.setState({ receivedData: [] });
-      this.__getFetchingPromise(query);
-    }
-  };
-  // componentDidMount = this.componentDidUpdate;
-  render() {
-    const data = this.state.receivedData;
-    const dLen = data && data.length;
-    return h(
-      "div",
-      { "data-js": dLen, class: "info-header" },
-      dLen ? h(MovieReel, { reelData: data, cancelAnimations: true }) : null
-    );
-  }
+  return receivedData;
 }
 
-export class RealTimeResponseTextComponent extends RealTimeResponseThumbnailComponent {
-  render() {
-    const data = this.state.receivedData;
-    const dLen = data && data.length;
-    return h(
-      "div",
-      { "data-js": dLen, class: "info-header" },
-      dLen ? h("div", { reelData: data, cancelAnimations: true }) : null
-    );
-  }
+export default function RealTimeResponseThumbnailComponent(props) {
+  const query = _normalize(props.query);
+
+  const [pendingResponse, setPendingResponse] = useState(null);
+  const [reelData, setReelData] = useState([]);
+  const controller = useRef(null);
+  useEffect(() => {
+    if (!query || (!query.trim() && reelData.length)) setReelData([]);
+  }, [query, reelData]);
+  const __getFetchingPromise = useCallback(
+    debounce(250, (q) => {
+      if (!q || !q.trim()) return setReelData([]);
+      const c = new AbortController();
+      const signal = c.signal;
+      controller.current = c;
+      setPendingResponse(true);
+      let rData = [];
+      const movieRequest = getRequest(
+        apiURL("/query/movies/search/", { q }),
+        null,
+        {
+          signal,
+        }
+        // DO NOT cache this
+      );
+      const actorRequest = getRequest(
+        apiURL("/query/actors/search/", { q }),
+        null,
+        { signal }
+      );
+
+      Promise.all([
+        movieRequest
+          .then((resp) => resp.json())
+          .then((data) => {
+            rData = rData.concat(parseData(data));
+            setReelData(rData);
+            controller.current = null;
+          }),
+        actorRequest
+          .then((resp) => resp.json())
+          .then((data) => {
+            rData = rData.concat(parseData(data));
+            setReelData(rData);
+            controller.current = null;
+          }),
+      ])
+        .then(() => setPendingResponse(null))
+        .catch(() => setPendingResponse(null));
+    }),
+    [reelData]
+  );
+  useEffect(() => {
+    const current = controller.current;
+    const abort = () => current && current.abort();
+    setReelData([]);
+    if (!query) {
+      abort();
+    }
+    pendingResponse && abort();
+    __getFetchingPromise(query);
+  }, [query]);
+
+  useEffect(() => {
+    const c = new AbortController();
+    (async () => {
+      if (props.imdbSearch) {
+        try {
+          const resp = await getRequest(
+            apiURL("/query/movies/search/_/imdb/", { q: query }),
+            null,
+            { signal: c.signal }
+          );
+          const respJson = await resp.json();
+          props.setImdb(false);
+          const data = deNodeify(respJson.data).IMDBSearchResults;
+          const imdbData = data.map((x) => {
+            return {
+              name: x.title,
+              thumb: x.thumbnail.template_height.replace("{{height}}", "200"),
+              movie_id: x._imdb_details.id,
+            };
+          });
+
+          setReelData((rd) => rd.concat(imdbData));
+        } catch (e) {
+          props.setImdb(false);
+          console.log(e);
+        }
+      }
+    })();
+    return () => c.abort();
+  }, [props.imdbSearch, query]);
+
+  const dLen = reelData && reelData.length;
+  const common = new FakeSet();
+
+  return h(
+    "div",
+    { "data-js": dLen, class: "info-header" },
+    dLen
+      ? h(MovieReel, {
+          reelData: reelData.filter((x) => {
+            const id = x.movie_id || x.actor_id;
+            if (common.has(id)) return false;
+            common.add(id);
+            return true;
+          }),
+          cancelAnimations: true,
+        })
+      : null
+  );
 }

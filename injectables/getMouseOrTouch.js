@@ -5,7 +5,7 @@ const { minify } = require("terser");
  * @param {Window} win
  * @param {Document} doc
  */
-const code = function(win, doc) {
+const code = function (win, doc) {
   var TOUCH_EVENT = "touchstart";
   var MOUSE_EVENT = "mousedown";
   var body = doc.body;
@@ -29,7 +29,7 @@ const code = function(win, doc) {
   body.addEventListener(MOUSE_EVENT, hasMouseIntent);
 };
 function create() {
-  return minify(`(${code})(window,document)`).code;
+  return minify(`(${code})(window,document)`).then((x) => x.code);
 }
 
 module.exports = { create };

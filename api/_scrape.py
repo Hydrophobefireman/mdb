@@ -1,15 +1,17 @@
 from urllib.parse import urljoin
+
 try:
     from ._constants import HOST, PROTO
     from ._util import get_id, get_page, id_to_url, image_url_parser, sanitize_str
     from .crawlers._movie_crawler import IMDBMovieData, scrape_movie_data
     from .crawlers._search_crawler import scrape_search
-    
+
 except ImportError:
     from _constants import HOST, PROTO
     from _util import get_id, get_page, id_to_url, image_url_parser, sanitize_str
     from crawlers._movie_crawler import IMDBMovieData, scrape_movie_data
     from crawlers._search_crawler import scrape_search
+
 
 def _normalize_movie_data(imdb_data: IMDBMovieData, mid: str):
     actor_id_to_name_dict = {}
@@ -27,6 +29,7 @@ def _normalize_movie_data(imdb_data: IMDBMovieData, mid: str):
     tagline_dict = imdb_data.tagline.get("taglines")
     trivia_dict = imdb_data.trivia.get("trivia")
     summary_dict = imdb_data.summary.get("summaries")
+
     return {
         "summary": summary_dict,
         "trivia": trivia_dict,
@@ -41,6 +44,22 @@ def get_movie_from_url(url: str,):
     return get_movie_from_id(get_id(url))
 
 
+def scrape_meta_data(page):
+    time = page.find("time")
+    time = time.text.strip() if time else None
+    div = page.find("div", attrs={"class": "subtext"})
+    genres = []
+    release_date = None
+    if div is not None:
+        anchors = div.find_all("a")
+        if anchors:
+            date = anchors[-1]
+            release_date = date.text.strip()
+            genres = [x.text.strip() for x in anchors[:-1]]
+
+    return {"time": time, "genres": genres, "release_date": release_date}
+
+
 def add_movie_from_id(idx) -> dict:
     url = id_to_url(idx)
     page = get_page(url)
@@ -49,13 +68,15 @@ def add_movie_from_id(idx) -> dict:
         page.find("meta", attrs={"property": "og:image"}).attrs.get("content")
     )
     _searchable = sanitize_str(title)
-    data = _prepare_results(idx, thumb, title, _searchable)
+    meta = scrape_meta_data(page)
+    data = _prepare_results(idx, thumb, title, _searchable, meta)
     return data
 
 
-def _prepare_results(idx, thumb, title, searchable_title):
+def _prepare_results(idx, thumb, title, searchable_title, meta):
     dct = get_movie_from_id(idx)
     dct["movie_thumb"] = thumb
+    dct["meta"] = meta
     dct["movie_title"] = title
     dct["_searchable"] = searchable_title
     return dct

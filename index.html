@@ -10,9 +10,7 @@
     <script>
       window.__mdbApp=JSON.parse(<%= JSON.stringify(JSON.stringify(require("./injectables/initialConfig.json"))) %>)
     </script>
-    <%=
-    require("./injectables/createLinkTags.js").create(require('./injectables/preconnectOrigins.json'),"preconnect")
-    %>
+    <%= htmlWebpackPlugin.options.preconnectOrigins %>
     <link
       rel="preload"
       href="https://fonts.pycode.tk/open-sans.css"
@@ -26,7 +24,7 @@
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <script>
-      <%= require("./injectables/preloadPaths.js").create() %>
+      <%= htmlWebpackPlugin.options.preloadPaths %>
     </script>
   </head>
   <body>
@@ -56,7 +54,7 @@
       <div class="spinner"></div
     ></template>
     <script>
-      <%= require("./injectables/getMouseOrTouch.js").create() %>
+      <%= htmlWebpackPlugin.options.mouseOrTouch %>
     </script>
     <div id="app-root" unrendered>
       <noscript>This App Uses Javascript</noscript>

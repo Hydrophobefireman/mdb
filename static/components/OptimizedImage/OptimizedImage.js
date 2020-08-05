@@ -1,58 +1,40 @@
-import { Component, h } from "@hydrophobefireman/ui-lib";
+import {
+  Component,
+  h,
+  useRef,
+  useEffect,
+  useState,
+} from "@hydrophobefireman/ui-lib";
 import entries from "@hydrophobefireman/j-utils/@build-modern/src/modules/Object/entries";
 import assign from "@hydrophobefireman/j-utils/@build-modern/src/modules/Object/assign";
 
 import CloudinaryImage from "./CloudinaryImage";
-export default class OptimizedImage extends Component {
-  extractProps() {
-    const { src, children: _, ...config } = this.props;
-    return { src, config };
-  }
-  init() {
-    const { src, config } = this.extractProps();
 
+export default function OptimizedImage(props) {
+  const { src, class: className, children, useImgTag, ...config } = props;
+  /**@type {{current:CloudinaryImage}} */
+  const [rawImage, setRawImage] = useState(false);
+  const [imgURL, setURL] = useState(null);
+  useEffect(async () => {
+    if (!src || !src.includes("res.cloudinary")) return setRawImage(true);
     const image = new CloudinaryImage(src);
-    const lowQualURL = image.set("w", 5).set("f", "auto").get();
-
+    const lowQual = image.set("w", 5).set("f", "auto").get();
+    image.set("w", null);
     entries(config).forEach(([key, val]) => image.set(key, val));
-
-    this.setState({ lowQualURL, image });
-  }
-  async componentDidUpdate(oldProps) {
-    const { src, config } = this.extractProps();
-    if (oldProps && oldProps.src !== src) {
-      return this.init();
-    }
-    if (!this.loadedFullQualityImage) {
-      this.setState({
-        loadedFullQualityImage: await this.state.image.preloadImage(),
+    setRawImage(false);
+    setURL(lowQual);
+    await image.preloadImage();
+    setURL(image.get());
+  }, [src]);
+  const height = config.h || config.height;
+  const width = config.w || config.width;
+  const style = { width: `${width}px`, height: `${height}px` };
+  const $src = rawImage ? src : imgURL;
+  if (!$src) return;
+  return useImgTag
+    ? h("img", { src: $src, className })
+    : h("div", {
+        class: ["opt-image"].concat(className),
+        style: assign(style, { backgroundImage: `url(${$src})` }),
       });
-    }
-  }
-
-  componentDidMount() {
-    this.init();
-  }
-
-  render(_props, state) {
-    const { height, h: _h, w, width, src, ...props } = _props;
-    const backgroundImageURL = state.loadedFullQualityImage
-      ? this.state.image.get()
-      : state.lowQualURL;
-
-    props.style = props.style || {};
-    const wdth = `${width || w}px`;
-    const ht = `${height || _h}px`;
-
-    assign(props.style, { width: wdth, height: ht });
-
-    const style = backgroundImageURL
-      ? { backgroundImage: `url(${backgroundImageURL})` }
-      : null;
-
-    return h("div", {
-      class: "opt-image",
-      style,
-    });
-  }
 }

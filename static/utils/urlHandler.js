@@ -23,7 +23,7 @@ export function deNodeify(json) {
     const newObj = {};
     for (const [k, v] of entries(json)) {
       if (Array.isArray(v)) {
-        newObj[k] = v.map((x) => x.__node);
+        newObj[k] = v.map((x) => x.__node || x);
       } else {
         newObj[k] = deNodeify(v);
       }

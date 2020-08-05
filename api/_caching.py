@@ -7,8 +7,8 @@ from tempfile import gettempdir
 
 caching_options = {
     "enable_caching": True,
-    "directory": gettempdir(),
-    "get_file_name": lambda x: f"{x}.cache.json",
+    "directory": join(gettempdir(), "mdb@cache"),
+    "get_file_name": lambda x: f"{x}#cache.json",
     "expire_if_older_than_seconds": 86400,
 }
 

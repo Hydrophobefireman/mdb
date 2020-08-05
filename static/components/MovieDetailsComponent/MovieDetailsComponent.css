@@ -1,0 +1,74 @@
+.triv-piece {
+  margin-left: 10px;
+  margin-top: 30px;
+  font-weight: lighter;
+  font-size: 1.5rem;
+}
+.movie-poster {
+  max-height: 80vh;
+  max-width: 48vw;
+  min-height: 20vh;
+  min-width: 20vw;
+  border-radius: 20px;
+}
+.poster-parent {
+  flex: 1;
+}
+.toggle {
+  width: 20%;
+  border-radius: 5px;
+  padding: 0.3rem;
+  outline: none;
+  border: 2px solid;
+}
+
+.poster-box {
+  display: flex;
+  margin-top: 20px;
+  flex-direction: row;
+  padding: 0.5rem;
+}
+
+.movie-title {
+  flex: 1;
+  font-weight: bold;
+  font-size: 1.5rem;
+  padding: 10px;
+  text-align: left;
+}
+
+.movie-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.movie-meta-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: left;
+  flex: 1;
+}
+
+.meta-text {
+  margin-left: 10px;
+  text-align: left;
+}
+.data-list {
+  text-align: left;
+  padding: 1rem;
+}
+.summary-view {
+  width: 40%;
+  text-align: left;
+  padding: 0.8rem;
+  margin-top: 10px;
+}
+
+.summary-data {
+  margin-left: 30px;
+  background: #fafafa;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+}

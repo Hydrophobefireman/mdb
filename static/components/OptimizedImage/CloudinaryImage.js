@@ -1,15 +1,6 @@
 import entries from "@hydrophobefireman/j-utils/@build-modern/src/modules/Object/entries";
 import FakeSet from "@hydrophobefireman/j-utils/@build-modern/src/modules/es6/loose/Set/index";
 import { optionsListenOnce } from "./webpSupport";
-/**
- * @type {boolean}
- */
-const supportsLinkRelPreload = (() => {
-  if (!("relList" in HTMLLinkElement.prototype)) return false;
-  const link = document.createElement("link");
-  link.rel = "preload";
-  return link.relList.contains("preload");
-})();
 
 const preloadedSet = new FakeSet();
 
@@ -21,6 +12,7 @@ export default class CloudinaryImage {
   _paramMap = { quality: "q", height: "h", width: "w" };
 
   constructor(url) {
+    if (!url) return;
     this._init(url);
   }
   /**
@@ -39,18 +31,24 @@ export default class CloudinaryImage {
    * @returns {CloudinaryImage}
    */
   set(param, value, _overwrite) {
+    if (!this._configs) return this;
     param = this._paramMap[param] || param;
     if (_overwrite) this._configs = {};
-    this._configs[param] = value;
+    if (value == null) {
+      delete this._configs[param];
+    } else this._configs[param] = value;
     return this;
   }
   /**
    * @returns {string}
    */
   get() {
+    if (!this._static || !this._fileName || !this._configs)
+      return "data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAD8D+JaQAA3AA/ua1AAA=";
     const mid = entries(this._configs)
       .map(([x, y]) => `${x}_${y}`)
       .join(",");
+
     return [this._static, mid, this._fileName].join("/");
   }
   // /**
@@ -86,16 +84,14 @@ export default class CloudinaryImage {
   _preloadUsingImageSrcStrategy(src) {
     if (preloadedSet.has(src)) return Promise.resolve(true);
     const i = new Image();
+
     return new Promise((resolve) => {
-      i.addEventListener(
-        "load",
-        () => {
-          preloadedSet.add(src);
-          resolve(true);
-        },
-        optionsListenOnce
-      );
-      i.addEventListener("error", () => resolve(false), optionsListenOnce);
+      const listener = () => {
+        preloadedSet.add(src);
+        resolve(true);
+      };
+      i.addEventListener("load", listener, optionsListenOnce);
+      i.addEventListener("error", listener, optionsListenOnce);
       i.src = src;
     });
   }
@@ -103,12 +99,11 @@ export default class CloudinaryImage {
   /**
    *
    * @param {string} src src of image to load
-   * @param {"preload"|"img"|void} strategy one of preload or img
    * @returns {Promise<boolean>}
    */
-  preloadImage(src, strategy) {
+  preloadImage(src) {
     src = src || this.get();
-
+    if (!src) return Promise.resolve(true);
     return this._preloadUsingImageSrcStrategy(src);
   }
   /**
@@ -125,14 +120,18 @@ export default class CloudinaryImage {
    * @param {string} url
    */
   _parseURL(url) {
-    const x = new URL(url);
-    const paths = x.pathname.split("/");
-    const pathLength = paths.length;
-    const fileName = paths[pathLength - 1];
-    const staticData = paths.slice(0, pathLength - 2).join("/");
-    const configs = {};
-    this._static = x.protocol + "//" + x.host + staticData;
-    this._fileName = fileName;
-    this._configs = configs;
+    try {
+      const x = new URL(url);
+      const paths = x.pathname.split("/");
+      const pathLength = paths.length;
+      const fileName = paths[pathLength - 1];
+      const staticData = paths.slice(0, pathLength - 2).join("/");
+      const configs = {};
+      this._static = x.protocol + "//" + x.host + staticData;
+      this._fileName = fileName;
+      this._configs = configs;
+    } catch (e) {
+      console.log(e, url);
+    }
   }
 }

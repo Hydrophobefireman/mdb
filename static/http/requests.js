@@ -52,12 +52,11 @@ async function fetchRequest(url, headers, options = {}, method, cache) {
     headers: sendHeaders,
     ...sendOptions,
   });
-  const func = retry(fetch, 3, 100);
-  const resp = await func(req);
+  const resp = await fetch(req);
   if (cache) {
     const { shouldCache, cacheTime } = cache;
     if (shouldCache) {
-      cacheInBackground(await resp.clone(), url, cacheTime);
+      cacheInBackground(resp.clone(), url, cacheTime);
     }
   }
   return resp;

@@ -3,14 +3,15 @@ import OptimizedImage from "../OptimizedImage/OptimizedImage";
 
 export default function MovieReel(props) {
   const { recs, reelData, cancelAnimations } = props;
-  const data = reelData || recs.data.landingData.map(x => x.__node);
+  const data = reelData || recs.data.landingData.map((x) => x.__node);
   return data.map((x, i) =>
     h(ReelItem, {
-      title: x.movie_title,
-      img: x.movie_thumb,
-      id: x.movie_id,
+      name: x.movie_title || x.name,
+      img: x.thumb || x.movie_thumb,
+      movie_id: x.movie_id,
+      actor_id: x.actor_id,
       index: i,
-      cancelAnimations
+      cancelAnimations,
     })
   );
 }
@@ -19,13 +20,19 @@ function ReelItem(props) {
   return h(
     A,
     {
-      href: `/title/${props.id}`,
+      href: props.movie_id
+        ? `/title/${props.movie_id}`
+        : `/actor/${props.actor_id}`,
       class: "movie-reel-item",
       "data-id": props.id,
       "no-animate": !!props.cancelAnimations,
-      style: { animationDelay: `${0.08 * props.index}s` }
+      style: { animationDelay: `${0.08 * props.index}s` },
     },
-    h(OptimizedImage, { src: props.img, height: 200, width: 150 }),
-    h("span", { class: "movie-reel-item-text" }, props.title)
+    h(OptimizedImage, {
+      src: props.img,
+      height: 200,
+      width: 150,
+    }),
+    h("span", { class: "movie-reel-item-text" }, props.name)
   );
 }

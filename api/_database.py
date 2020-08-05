@@ -11,10 +11,12 @@ try:
     from ._upload import upload
     from ._util import array_to_nodes, sanitize_str, de_nodify, remove_falsey_values
     from ._caching import cache
+    from ._scrape import add_movie_from_id
 except ImportError:
     from _upload import upload
     from _util import array_to_nodes, sanitize_str, de_nodify, remove_falsey_values
     from _caching import cache
+    from _scrape import add_movie_from_id
 
 
 def get_keys():
@@ -72,7 +74,7 @@ class DatabaseManager(object):
             for t in threads:
                 t.join()
             ref = db.reference("totalMovieCount")
-            ref.set(ref.get() + 1)
+            ref.set((ref.get() or 0) + 1)
 
     def _id_q(self, name, idx):
         data = db.reference(f"/{name}").child(idx).get()
@@ -86,7 +88,9 @@ class DatabaseManager(object):
     def get_movie_data_from_id(self, idx):
         result = self._id_q("movieDetails", idx)
         if not result:
-            return None
+            resp = add_movie_from_id(idx)
+            self.add_data({idx: resp})
+            result = resp
         for i in ["summary", "tagline", "trivia"]:
             if i in result:
                 self._make_node(result, i)

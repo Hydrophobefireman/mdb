@@ -14,7 +14,7 @@ import "./components/Landing/landingComponent.css";
 import "./components/MovieReel/MovieReel.css";
 import "./components/OptimizedImage/opt.css";
 import "./components/Header/headerComponent.css";
-
+import "./components/MovieDetailsComponent/MovieDetailsComponent.css";
 const root = document.getElementById("app-root");
 init({
   "loading-spinner": {
@@ -31,6 +31,7 @@ init({
   },
 });
 const LoadingSpinner = () => h("loading-spinner", null, "Loading");
+
 function NotFoundComponent() {
   return h("div", null, "The Requested URL was not found");
 }
@@ -41,10 +42,11 @@ function AppLoader() {
     Array.from(componentMap.entries()).map(([x, y]) =>
       h(Path, {
         match: x,
-        component: h(AsyncComponent, {
-          componentPromise: y,
-          fallbackComponent: LoadingSpinner,
-        }),
+        component: (props) =>
+          h(AsyncComponent, {
+            componentPromise: () => y().then((c) => h(c, props)),
+            fallbackComponent: LoadingSpinner,
+          }),
       })
     )
   );
