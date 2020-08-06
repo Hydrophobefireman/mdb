@@ -1,17 +1,21 @@
-import { h, useState, useEffect, A } from "@hydrophobefireman/ui-lib";
+import { h, useState, useEffect, useCallback } from "@hydrophobefireman/ui-lib";
 import {
   Object_keys as keys,
   Object_entries as entries,
 } from "@hydrophobefireman/j-utils";
 import { getRequest } from "../../http/requests";
-import { apiURL } from "../../utils/urlHandler";
+import { apiURL, deNodeify } from "../../utils/urlHandler";
 import OptimizedImage from "../OptimizedImage/OptimizedImage";
+import { ActorData } from "../ActorData/ActorData";
 
 export function Credits({ credits }) {
   const [castData, setCastData] = useState(null);
   const [loading, setLoading] = useState(false);
   const cast = credits.cast;
-  const director = credits.director;
+  const [showCastInfo, setShow] = useState(null);
+  useEffect(() => {
+    setShow(null);
+  }, [credits]);
   useEffect(async () => {
     const actorIDs = keys(cast);
     setLoading(true);
@@ -26,35 +30,56 @@ export function Credits({ credits }) {
     });
     setCastData(cData);
   }, [credits]);
+  const handleClick = useCallback((e) => {
+    e.preventDefault();
+    const js = deNodeify(JSON.parse(e.target.dataset.js));
+    setShow(js);
+  }, []);
+  const back = useCallback(() => setShow(null));
+  if (showCastInfo) return h(ActorData, { data: showCastInfo, back });
   return loading
     ? h("loading-spinner")
     : h(
         "div",
         null,
-        h("div", null, "Directed by - ", director),
         h(
           "div",
-          { style: { display: "flex", flexWrap: "wrap" } },
+          {
+            style: {
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+            },
+          },
           castData &&
             entries(castData).map(([id, data], i) => {
               return h(
-                A,
+                "a",
                 {
                   href: `/actor/${id}`,
-                  class: "movie-reel-item",
-                  "data-id": id,
+                  class: "movie-reel-item prevent-child-click-events",
+                  "data-js": JSON.stringify(data),
                   style: { animationDelay: `${0.08 * i}s` },
+                  onClick: handleClick,
                 },
                 h(
                   "div",
-                  { style: { height: 200, width: 150 } },
+                  { style: { height: `${200}px`, width: `${150}px` } },
                   h(OptimizedImage, {
+                    useImgTag: true,
                     src: data.thumbnail,
                     height: 200,
                     width: 150,
                   })
                 ),
-                h("span", { class: "movie-reel-item-text" }, data.name)
+                h(
+                  "span",
+                  { class: "movie-reel-item-text" },
+                  data.name,
+                  " - (",
+                  data.character,
+                  ")"
+                )
               );
             })
         )

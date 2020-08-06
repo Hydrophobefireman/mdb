@@ -102,4 +102,6 @@ const idbinit = ($$storeName) => {
   }
   return { get, set, __clear__, keys, del };
 };
-export const getKeyStore = (name) => idbinit(name);
+const getKeyStore = (name) => idbinit(name);
+
+export { getKeyStore };

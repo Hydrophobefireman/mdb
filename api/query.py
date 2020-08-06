@@ -58,23 +58,28 @@ def query_imdb():
     return json_resp(resp_template("IMDBSearchResults", resp))
 
 
+def filter_data(data):
+    rd_arr = ["movie_title", "movie_thumb"]
+    for x in data:
+        i = data[x]
+        to_pop = [key for key in i if key not in rd_arr]
+        for j in to_pop:
+            i.pop(j)
+    return data
+
+
 @app.route("/query/movies/search/", strict_slashes=False)
 def query_firebase_movies():
     q = get_query(request)
     # is_auto = "isAutoComplete" in request.args
-    rd_arr = ["movie_title", "movie_thumb"]
+
     if not q:
         data = []
     else:
         # if not is_auto:
         _resp = api_search_firebase_movies(q[0])
         data = api_get_movie_details(_resp)  # needs opt
-        for x in data:
-            i = data[x]
-            to_pop = [key for key in i if key not in rd_arr]
-            for j in to_pop:
-                i.pop(j)
-
+        data = filter_data(data)
     return json_resp(resp_template("movieSearchResults", data))
 
 
@@ -92,10 +97,13 @@ def query_firebase_actors():
 @app.route("/query/movies/id/search/", strict_slashes=False)
 def query_firebase_movies_by_id():
     q = get_query(request)
+    _filter = request.args.get("filter") == "true"
     if not q:
         resp = []
     else:
         resp = api_get_movie_details(q)
+        if _filter:
+            resp = filter_data(resp)
     return json_resp(resp_template("movieDetails", resp))
 
 

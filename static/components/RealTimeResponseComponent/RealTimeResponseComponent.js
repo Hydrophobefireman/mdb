@@ -31,7 +31,6 @@ export function parseData(data) {
 export default function RealTimeResponseThumbnailComponent(props) {
   const query = _normalize(props.query);
 
-  const [pendingResponse, setPendingResponse] = useState(null);
   const [reelData, setReelData] = useState([]);
   const controller = useRef(null);
   useEffect(() => {
@@ -43,51 +42,43 @@ export default function RealTimeResponseThumbnailComponent(props) {
       const c = new AbortController();
       const signal = c.signal;
       controller.current = c;
-      setPendingResponse(true);
       let rData = [];
+      // DO NOT cache this
       const movieRequest = getRequest(
         apiURL("/query/movies/search/", { q }),
         null,
-        {
-          signal,
-        }
-        // DO NOT cache this
+        { signal }
       );
       const actorRequest = getRequest(
         apiURL("/query/actors/search/", { q }),
         null,
         { signal }
       );
-
       Promise.all([
         movieRequest
           .then((resp) => resp.json())
           .then((data) => {
             rData = rData.concat(parseData(data));
-            setReelData(rData);
-            controller.current = null;
+            query === q && setReelData(rData);
           }),
         actorRequest
           .then((resp) => resp.json())
           .then((data) => {
             rData = rData.concat(parseData(data));
-            setReelData(rData);
-            controller.current = null;
+            query === q && setReelData(rData);
           }),
       ])
-        .then(() => setPendingResponse(null))
-        .catch(() => setPendingResponse(null));
+        .then(() => (controller.current = null))
+        .catch(() => (controller.current = null));
     }),
-    [reelData]
+    [reelData, query]
   );
+
   useEffect(() => {
     const current = controller.current;
     const abort = () => current && current.abort();
     setReelData([]);
-    if (!query) {
-      abort();
-    }
-    pendingResponse && abort();
+    abort();
     __getFetchingPromise(query);
   }, [query]);
 

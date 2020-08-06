@@ -15,6 +15,7 @@ import "./components/MovieReel/MovieReel.css";
 import "./components/OptimizedImage/opt.css";
 import "./components/Header/headerComponent.css";
 import "./components/MovieDetailsComponent/MovieDetailsComponent.css";
+import "./components/ActorData/ActorData.css";
 const root = document.getElementById("app-root");
 init({
   "loading-spinner": {

@@ -56,3 +56,7 @@ a {
   font-size: 3rem;
   font-weight: bold;
 }
+
+.prevent-child-click-events > * {
+  pointer-events: none;
+}

@@ -118,7 +118,7 @@ def get_last_result(od):
 
 
 def search_regex(search_from, q):
-    constructed_query = escape(q)
+    constructed_query = sanitize_str(escape(q))
     return [v for k, v in search_from.items() if search(constructed_query, k)]
 
 

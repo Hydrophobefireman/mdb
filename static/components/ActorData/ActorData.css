@@ -1,0 +1,15 @@
+.anim-scale {
+  transition: 0.3s linear;
+  transform: scale(0);
+  animation: scale_anim 0.3s linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes scale_anim {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}

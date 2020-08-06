@@ -17,5 +17,7 @@ addRoute(createRoutePath("/title/:movie"), () =>
     getDefault
   )
 );
-
+addRoute(createRoutePath("/actor/:actor_id"), () =>
+  import("./components/ActorData/ActorData").then(getDefault)
+);
 export default componentMap;

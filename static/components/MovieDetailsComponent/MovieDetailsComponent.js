@@ -1,30 +1,18 @@
-import { h, useEffect, useState } from "@hydrophobefireman/ui-lib";
-import { getKeyStore } from "../../utils/respCache";
-import { getRequest } from "../../http/requests";
-import { apiURL, deNodeify } from "../../utils/urlHandler";
+import { h, useEffect, useState, useRef } from "@hydrophobefireman/ui-lib";
 import { PosterBox } from "./PosterBox";
 import { Taglines } from "./Taglines";
 import { Summary } from "./Summary";
 import { Trivia } from "./Trivia";
 import { Credits } from "./Credits";
-const store = getKeyStore("movie-data-store");
+import { cachedMovieData } from "../../http/requests";
 
 export default function MovieDetails(props) {
   const movieId = props.params.movie;
   const [data, setData] = useState(null);
   useEffect(async () => {
-    const check = await store.get(movieId);
-    if (check) return setData(check);
-    const req = await getRequest(
-      apiURL("/query/movies/id/search", { q: movieId })
-    );
-    const data = deNodeify((await req.json()).data.movieDetails);
-    store.set(movieId, data);
-    return setData(data);
+    return setData(await cachedMovieData(movieId));
   }, [movieId]);
-  return data
-    ? h(MovieDataRenderer, { data: data[movieId] })
-    : h("loading-spinner");
+  return data ? h(MovieDataRenderer, { data }) : h("loading-spinner");
 }
 
 function MovieDataRenderer({ data }) {
@@ -32,9 +20,11 @@ function MovieDataRenderer({ data }) {
   const summary = data.summary;
   const trivia = data.trivia;
   const credits = data.credits;
+  const ref = useRef();
+  useEffect(() => scroll({ top: 0, left: 0, behavior: "smooth" }), [data]);
   return h(
     "div",
-    { class: "movie-data" },
+    { class: "movie-data", ref },
     h(PosterBox, { data }),
     h(Taglines, { taglines }),
     h(Credits, { credits }),
