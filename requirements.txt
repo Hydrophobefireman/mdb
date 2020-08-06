@@ -4,3 +4,4 @@ firebase_admin==4.3.0
 Flask==1.1.2
 html5lib==1.1
 beautifulsoup4==4.9.1
+gunicorn==20.0.4
