@@ -2,7 +2,7 @@ import { h, useEffect, useState } from "@hydrophobefireman/ui-lib";
 import entries from "@hydrophobefireman/j-utils/@build-modern/src/modules/Object/entries";
 import assign from "@hydrophobefireman/j-utils/@build-modern/src/modules/Object/assign";
 
-import CloudinaryImage from "./CloudinaryImage";
+import CloudinaryImage, { defaultImg } from "./CloudinaryImage";
 
 export default function OptimizedImage(props) {
   const { src, class: className, children, useImgTag, ...config } = props;
@@ -27,17 +27,17 @@ export default function OptimizedImage(props) {
   const width = config.w || config.width;
   const style = { width: `${width}px`, height: `${height}px` };
   const $src = rawImage ? src : imgURL;
-  if (!$src) return;
+  if (!$src && !rawImage && !width && !height) return;
   const cls = loading ? "img-loading" : null;
   return useImgTag
     ? h("img", {
-        src: $src,
+        src: $src || defaultImg,
         class: [cls].concat(className),
         width,
         height,
       })
     : h("div", {
         class: ["opt-image", cls].concat(className),
-        style: assign(style, { backgroundImage: `url(${$src})` }),
+        style: assign(style, { backgroundImage: `url(${$src || defaultImg})` }),
       });
 }

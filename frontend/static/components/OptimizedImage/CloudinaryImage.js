@@ -1,7 +1,7 @@
 import entries from "@hydrophobefireman/j-utils/@build-modern/src/modules/Object/entries";
 import FakeSet from "@hydrophobefireman/j-utils/@build-modern/src/modules/es6/loose/Set/index";
-import { optionsListenOnce } from "./webpSupport";
-
+export const defaultImg =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2NgYGD4DwABBAEAcCBlCwAAAABJRU5ErkJggg==";
 const preloadedSet = new FakeSet();
 
 export default class CloudinaryImage {
@@ -43,8 +43,7 @@ export default class CloudinaryImage {
    * @returns {string}
    */
   get() {
-    if (!this._static || !this._fileName || !this._configs)
-      return "data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAD8D+JaQAA3AA/ua1AAA=";
+    if (!this._static || !this._fileName || !this._configs) return defaultImg;
     const mid = entries(this._configs)
       .map(([x, y]) => `${x}_${y}`)
       .join(",");
@@ -90,8 +89,8 @@ export default class CloudinaryImage {
         preloadedSet.add(src);
         resolve(true);
       };
-      i.addEventListener("load", listener, optionsListenOnce);
-      i.addEventListener("error", listener, optionsListenOnce);
+      i.addEventListener("load", listener, { once: true });
+      i.addEventListener("error", listener, { once: true });
       i.src = src;
     });
   }
