@@ -59,6 +59,7 @@ export function Credits({ credits }) {
                   href: `/actor/${id}`,
                   class: "movie-reel-item prevent-child-click-events",
                   "data-js": JSON.stringify(data),
+                  "no-animate": true,
                   style: { animationDelay: `${0.08 * i}s` },
                   onClick: handleClick,
                 },

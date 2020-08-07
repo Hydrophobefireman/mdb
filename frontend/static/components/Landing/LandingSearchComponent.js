@@ -3,11 +3,11 @@ import RealTimeResponseThumbnailComponent from "../RealTimeResponseComponent/Rea
 import { useMount } from "../../utils/hooks";
 export default function LandingSearchComponent({ toggle }) {
   const [value, setValue] = useState("");
-  const [imdbSearch, setIMDBSearch] = useState(false);
+  const [search, setSearch] = useState(false);
   const handleInput = useCallback((e) => setValue(e.target.value || ""), []);
   const handleFormSubmit = useCallback(() => {
     if (!value) return;
-    setIMDBSearch(true);
+    setSearch(true);
   }, [value]);
   const inputRef = useRef();
   useMount(() => inputRef.current && inputRef.current.focus(), []);
@@ -52,11 +52,11 @@ export default function LandingSearchComponent({ toggle }) {
         placeholder: "Search..",
       })
     ),
-    imdbSearch && h("div", null, h("loading-spinner")),
+    search && h("div", null, h("loading-spinner")),
     h(RealTimeResponseThumbnailComponent, {
       query: value.trim(),
-      imdbSearch,
-      setImdb: setIMDBSearch,
+      search,
+      setSearch,
     })
   );
 }

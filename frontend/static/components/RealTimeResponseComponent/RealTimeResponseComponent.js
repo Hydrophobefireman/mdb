@@ -59,16 +59,17 @@ export default function RealTimeResponseThumbnailComponent(props) {
           .then((resp) => resp.json())
           .then((data) => {
             rData = rData.concat(parseData(data));
-            query === q && setReelData(rData);
           }),
         actorRequest
           .then((resp) => resp.json())
           .then((data) => {
             rData = rData.concat(parseData(data));
-            query === q && setReelData(rData);
           }),
       ])
-        .then(() => (controller.current = null))
+        .then(() => {
+          setReelData(rData);
+          controller.current = null;
+        })
         .catch(() => (controller.current = null));
     }),
     [reelData, query]
