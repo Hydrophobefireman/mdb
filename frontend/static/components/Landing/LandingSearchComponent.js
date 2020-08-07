@@ -52,7 +52,6 @@ export default function LandingSearchComponent({ toggle }) {
         placeholder: "Search..",
       })
     ),
-    search && h("div", null, h("loading-spinner")),
     h(RealTimeResponseThumbnailComponent, {
       query: value.trim(),
       search,

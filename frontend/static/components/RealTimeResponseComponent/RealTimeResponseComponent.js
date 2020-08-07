@@ -30,19 +30,23 @@ export function parseData(data) {
 
 export default function RealTimeResponseThumbnailComponent(props) {
   const query = _normalize(props.query);
-
   const [reelData, setReelData] = useState([]);
+  const [isLoading, setLoading] = useState(false);
   const controller = useRef(null);
   useEffect(() => {
     if (!query || (!query.trim() && reelData.length)) setReelData([]);
   }, [query, reelData]);
   const __getFetchingPromise = useCallback(
-    debounce(250, (q) => {
-      if (!q || !q.trim()) return setReelData([]);
+    (q) => {
+      if (!q || !q.trim() || !props.search) return setReelData([]);
+      setLoading(true);
+      props.setSearch(false);
       const c = new AbortController();
       const signal = c.signal;
       controller.current = c;
-      let rData = [];
+      let movies = [];
+      let actors = [];
+      let imdb = [];
       // DO NOT cache this
       const movieRequest = getRequest(
         apiURL("/query/movies/search/", { q }),
@@ -54,65 +58,56 @@ export default function RealTimeResponseThumbnailComponent(props) {
         null,
         { signal }
       );
+      const imdbResp = getRequest(
+        apiURL("/query/movies/search/_/imdb/", { q: query }),
+        null,
+        { signal }
+      );
       Promise.all([
         movieRequest
           .then((resp) => resp.json())
           .then((data) => {
-            rData = rData.concat(parseData(data));
+            movies = parseData(data);
           }),
         actorRequest
           .then((resp) => resp.json())
           .then((data) => {
-            rData = rData.concat(parseData(data));
+            actors = parseData(data);
           }),
-      ])
-        .then(() => {
-          setReelData(rData);
-          controller.current = null;
-        })
-        .catch(() => (controller.current = null));
-    }),
-    [reelData, query]
-  );
-
-  useEffect(() => {
-    const current = controller.current;
-    const abort = () => current && current.abort();
-    setReelData([]);
-    abort();
-    __getFetchingPromise(query);
-  }, [query]);
-
-  useEffect(() => {
-    const c = new AbortController();
-    (async () => {
-      if (props.imdbSearch) {
-        try {
-          const resp = await getRequest(
-            apiURL("/query/movies/search/_/imdb/", { q: query }),
-            null,
-            { signal: c.signal }
-          );
-          const respJson = await resp.json();
-          props.setImdb(false);
-          const data = deNodeify(respJson.data).IMDBSearchResults;
-          const imdbData = data.map((x) => {
-            return {
+        imdbResp
+          .then((resp) => resp.json())
+          .then((data) => {
+            const js = deNodeify(data.data).IMDBSearchResults;
+            imdb = js.map((x) => ({
               name: x.title,
               thumb: x.thumbnail.template_height.replace("{{height}}", "200"),
               movie_id: x._imdb_details.id,
-            };
-          });
+            }));
+          }),
+      ])
+        .then(() => {
+          setReelData(movies.concat(actors, imdb));
+          controller.current = null;
+          setLoading(false);
+        })
+        .catch(() => {
+          setReelData([]);
+          controller.current = null;
+          setLoading(false);
+        });
+    },
+    [reelData, query, isLoading, props.search]
+  );
 
-          setReelData((rd) => rd.concat(imdbData));
-        } catch (e) {
-          props.setImdb(false);
-          console.log(e);
-        }
-      }
-    })();
-    return () => c.abort();
-  }, [props.imdbSearch, query]);
+  useEffect(() => {
+    if (props.search) {
+      const current = controller.current;
+      const abort = () => current && current.abort();
+      setReelData([]);
+      abort();
+      __getFetchingPromise(query);
+    }
+  }, [query, props.search]);
 
   const dLen = reelData && reelData.length;
   const common = new FakeSet();
@@ -130,6 +125,6 @@ export default function RealTimeResponseThumbnailComponent(props) {
           }),
           cancelAnimations: true,
         })
-      : null
+      : isLoading && h("loading-spinner")
   );
 }
