@@ -1,4 +1,4 @@
-import { useState, h, useCallback } from "@hydrophobefireman/ui-lib";
+import { useState, h, useCallback, useEffect } from "@hydrophobefireman/ui-lib";
 
 export function Summary({ summary }) {
   return h(
@@ -15,6 +15,7 @@ export function Summary({ summary }) {
 
 function SummaryEntry({ x }) {
   const [active, setActive] = useState(false);
+  useEffect(() => setActive(false), [x]);
   const setSummary = useCallback(() => setActive((curr) => !curr), []);
   return h(
     "div",

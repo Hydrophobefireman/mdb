@@ -3,6 +3,8 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const autoPrefixPlugin = require("autoprefixer");
 const WebpackModuleNoModulePlugin = require("webpack-module-nomodule-plugin");
+const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin")
+  .default;
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const { basename } = require("path");
 
@@ -125,6 +127,7 @@ function getCfg(isLegacy) {
       new MiniCssExtractPlugin({
         filename: "[name]/[hash].css",
       }),
+      new HTMLInlineCSSWebpackPlugin({}),
     ],
   };
 }

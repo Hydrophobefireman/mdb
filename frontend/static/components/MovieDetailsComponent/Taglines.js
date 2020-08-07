@@ -8,7 +8,7 @@ export function Taglines({ taglines }) {
     ) {}
     setCurrent(next);
   }, [taglines, current]);
-  useEffect(getRandom, []);
+  useEffect(getRandom, [taglines]);
   return h(
     "div",
     {
