@@ -22,12 +22,12 @@ export function Credits({ credits }) {
     const resp = await getRequest(
       apiURL("/query/actors/id/search/", { q: actorIDs.join("!") })
     );
-    setLoading(false);
     const data = (await resp.json()).data.actorDetails;
     const cData = {};
     actorIDs.forEach((id) => {
       cData[id] = { character: cast[id], ...data[id] };
     });
+    setLoading(false);
     setCastData(cData);
   }, [credits]);
   const handleClick = useCallback((e) => {

@@ -66,6 +66,9 @@ class DatabaseManager(object):
                 threads.add(t)
             searchable = movie_data.pop("_searchable")
             func = self._update_movie_details
+            movie_data["credits"]["cast"] = {
+                k: v for k, v in tuple(movie_data["credits"]["cast"].items())[:30]
+            }
             t = Thread(target=func, args=(movie_data, movie_id))
             threads.add(t)
             t.start()
@@ -98,11 +101,13 @@ class DatabaseManager(object):
         return result
 
     def _make_node(self, obj, key):
+
         obj[key] = array_to_nodes(obj[key])
 
     @cache(lambda _, x: f"actor-data-by-id--{x}")
     def get_actor_data_from_id(self, idx):
         actor_details = self._id_q("actorDetails", idx)
+
         self._make_node(actor_details, "movies")
         return actor_details
 
@@ -208,7 +213,7 @@ def _get_thumbs(max_size, start_at=None):
 
 
 def _firebase_get_random():
-    total_movies = manager.get_total_movies()
+    total_movies = manager.get_total_movies() or 0
     chunk_size = total_movies // 5
     if chunk_size < 100:  # return all of em
         thumbs, _ = _get_thumbs(total_movies)

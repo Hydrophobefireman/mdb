@@ -3,6 +3,7 @@ from json import dumps, loads
 from urllib.parse import urlparse
 
 from flask import Flask, Response, request
+from json import dumps
 
 try:
     from ._util import resp_template, sanitize_str
@@ -112,9 +113,20 @@ def query_firebase_actors_by_id():
     q = get_query(request)
     if not q:
         resp = []
+        return json_resp(resp_template("actorDetails", resp))
     else:
-        resp = api_get_actor_details(q)
-    return json_resp(resp_template("actorDetails", resp))
+
+        def gen():
+            yield '{"data": {"actorDetails":{'
+            last = len(q) - 1
+            for n, i in enumerate(q):
+                item = api_get_actor_details([i])
+                yield dumps(i) + ":" + dumps(item[i])
+                if n != last:
+                    yield ","
+            yield r"}}}"
+
+        return Response(gen(), content_type="application/json")
 
 
 @app.route("/query/movies/_/imdb_add/_/", strict_slashes=False, methods=["POST"])

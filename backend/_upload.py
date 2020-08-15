@@ -18,7 +18,7 @@ def upload(imgurl):
         cloudinary.config(
             cloud_name="cdn-media-proxy", api_key=clapi_key, api_secret=clapi_secret
         )
-        a = cloudinary.uploader.upload(imgurl)["secure_url"]
+        a = cloudinary.uploader.upload(imgurl, quality="auto")["secure_url"]
         return a
     except Exception as e:
         print(e, imgurl)

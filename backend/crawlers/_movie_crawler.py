@@ -2,7 +2,7 @@ from urllib.parse import urljoin
 
 try:
 
-    from .._constants import API_ROUTE, HOST, MAX_CAST_SIZE, MAX_TRIVIA_SIZE, PROTO
+    from .._constants import API_ROUTE, HOST, PROTO
     from .._util import (
         get_page,
         id_to_url,
@@ -11,7 +11,7 @@ try:
         remove_falsey_values,
     )
 except ImportError:
-    from _constants import API_ROUTE, HOST, MAX_CAST_SIZE, MAX_TRIVIA_SIZE, PROTO
+    from _constants import API_ROUTE, HOST, PROTO
     from _util import (
         get_page,
         id_to_url,
@@ -39,7 +39,7 @@ def scrape_credits(movie_id: str) -> dict:
         return None
     characters = cast.find_all(
         "tr", attrs={"class": lambda x: (x or "").lower().strip() in ["odd", "even"]}
-    )[:MAX_CAST_SIZE]
+    )
     cast_map = {}
     for char in characters:
         primary_pic = char.find(attrs={"class": "primary_photo"})
@@ -109,10 +109,7 @@ def scrape_trivia(movie_id: str) -> dict:
     url = urljoin(id_to_url(movie_id), "trivia")
     page = get_page(url)
     trivia_pieces = list(
-        map(
-            lambda x: x.text.strip(),
-            page.find_all("div", attrs={"class": "sodatext"})[:MAX_TRIVIA_SIZE],
-        )
+        map(lambda x: x.text.strip(), page.find_all("div", attrs={"class": "sodatext"}))
     )
     return {"trivia": trivia_pieces}
 

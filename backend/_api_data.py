@@ -11,7 +11,7 @@ try:
         firebase_search_regex,
         manager,
     )
-    from ._scrape import add_movie_from_id, add_movies, scrape_search
+    from ._scrape import add_movie_from_id, scrape_search
     from ._util import array_to_nodes, resp_template, sanitize_str
 
 except ImportError:
@@ -24,7 +24,7 @@ except ImportError:
         firebase_search_regex,
         manager,
     )
-    from _scrape import add_movie_from_id, add_movies, scrape_search
+    from _scrape import add_movie_from_id, scrape_search
     from _util import array_to_nodes, resp_template, sanitize_str
 
 
@@ -71,7 +71,7 @@ def api_get_movie_details(idx: list):
 
 # @cache(lambda x: f"actor-data-by-id-{hashit(''.join(x))}")
 def api_get_actor_details(q: list):
-    results = firebase_get_actors_by_id(*q)
+    results = firebase_get_actors_by_id(*q if isinstance(q, (list, tuple)) else q)
     return results
 
 

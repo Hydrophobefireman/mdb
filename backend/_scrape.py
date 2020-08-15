@@ -60,6 +60,19 @@ def scrape_meta_data(page):
     return {"time": time, "genres": genres, "release_date": release_date}
 
 
+def scrape_box_office(page):
+    bo = page.find("h3", attrs={"class": "subheading"}, text="Box Office")
+    next_divs = bo.find_all_next("div", attrs={"class": "txt-block"})[:3]
+    if not len(next_divs):
+        return {}
+    ret = {}
+    for i in next_divs:
+        key = i.find("h4").extract().text.replace(":", "").strip()
+        value = " ".join([x.strip() for x in i.text.split()])
+        ret[key] = value
+    return ret
+
+
 def add_movie_from_id(idx) -> dict:
     url = id_to_url(idx)
     page = get_page(url)
@@ -69,29 +82,19 @@ def add_movie_from_id(idx) -> dict:
     )
     _searchable = sanitize_str(title)
     meta = scrape_meta_data(page)
-    data = _prepare_results(idx, thumb, title, _searchable, meta)
+    box_office = scrape_box_office(page)
+    data = _prepare_results(idx, thumb, title, _searchable, meta, box_office)
     return data
 
 
-def _prepare_results(idx, thumb, title, searchable_title, meta):
+def _prepare_results(idx, thumb, title, searchable_title, meta, box_office):
     dct = get_movie_from_id(idx)
     dct["movie_thumb"] = thumb
     dct["meta"] = meta
+    dct["box_office"] = box_office
     dct["movie_title"] = title
     dct["_searchable"] = searchable_title
     return dct
-
-
-def add_movies(q):
-    results = scrape_search(q)
-    data_dict = {}
-    for result in results:
-        idx = result.movie_id
-        thumb = result.thumbnail
-        title = result.title
-        searchable_title = result.searchable_title
-        data_dict[idx] = _prepare_results(idx, thumb, title, searchable_title)
-    return data_dict
 
 
 def get_movie_from_id(idx: str):
