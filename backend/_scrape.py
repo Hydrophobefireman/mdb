@@ -61,16 +61,19 @@ def scrape_meta_data(page):
 
 
 def scrape_box_office(page):
-    bo = page.find("h3", attrs={"class": "subheading"}, text="Box Office")
-    next_divs = bo.find_all_next("div", attrs={"class": "txt-block"})[:3]
-    if not len(next_divs):
+    try:
+        bo = page.find("h3", attrs={"class": "subheading"}, text="Box Office")
+        next_divs = bo.find_all_next("div", attrs={"class": "txt-block"})[:3]
+        if not len(next_divs):
+            return {}
+        ret = {}
+        for i in next_divs:
+            key = i.find("h4").extract().text.replace(":", "").strip()
+            value = " ".join([x.strip() for x in i.text.split()])
+            ret[key] = value
+        return ret
+    except:
         return {}
-    ret = {}
-    for i in next_divs:
-        key = i.find("h4").extract().text.replace(":", "").strip()
-        value = " ".join([x.strip() for x in i.text.split()])
-        ret[key] = value
-    return ret
 
 
 def add_movie_from_id(idx) -> dict:
